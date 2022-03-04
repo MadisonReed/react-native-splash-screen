@@ -34,7 +34,10 @@ RCT_EXPORT_MODULE(SplashScreen)
 
 + (void)showSplash:(NSString*)splashScreen inRootView:(UIView*)rootView {
     if (!loadingView) {
-        loadingView = [[[NSBundle mainBundle] loadNibNamed:splashScreen owner:self options:nil] objectAtIndex:0];
+        UIStoryboard *sb = [UIStoryboard storyboardWithName:splashScreen bundle:nil];
+        UIViewController *vc = [sb instantiateViewControllerWithIdentifier:splashScreen];
+        
+        loadingView = vc.view;//[[[NSBundle mainBundle] loadNibNamed:splashScreen owner:self options:nil] objectAtIndex:0];
         CGRect frame = rootView.frame;
         frame.origin = CGPointMake(0, 0);
         loadingView.frame = frame;
@@ -51,7 +54,14 @@ RCT_EXPORT_MODULE(SplashScreen)
         });
     } else {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [loadingView removeFromSuperview];
+            [UIView animateWithDuration:1.5
+                delay: 0
+                options: UIViewAnimationOptionCurveEaseIn
+                animations:^{loadingView.alpha = 0.0;}
+                completion:(void (^)(BOOL)) ^{
+                    [loadingView removeFromSuperview];
+                }
+            ];
         });
     }
 }
